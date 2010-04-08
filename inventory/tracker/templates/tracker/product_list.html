@@ -1,0 +1,72 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>{% trans "Inventory - Product List" %}</title>
+        <link type="text/css" href="/inventory/media/css/ui-lightness/jquery-ui-1.8.custom.css" rel="stylesheet" />	
+		<script type="text/javascript" src="/inventory/media/js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="/inventory/media/js/jquery-ui-1.8.custom.min.js"></script>
+		<script type="text/javascript" src="/inventory/media/js/jquery.editinplace.js"></script>
+		<script type="text/javascript">
+            function set_qtys(data){
+                $('#hlabel').text(data['date']);
+                $.each(data['qtys'], function(id, qty){
+                    $('#h' + id).text(qty);
+                });
+            }
+			$(function(){
+				// Datepicker
+				$('#datepicker').datepicker({
+                    dateFormat: 'yy-mm-dd',
+                    onSelect: function(dateText, inst){
+                        $.getJSON('{% url qtys_on %}' + dateText, function(data){
+                            set_qtys(data);
+                        });
+                    }
+                });
+				// Slider
+				$('#slider').slider({
+                    min: 0,
+                    max: 30,
+                    value: 30,
+                    stop: function(event, ui){
+                        $.getJSON('{% url qtys_before %}' + (30 - $('#slider').slider('value')), function(data){
+                            set_qtys(data);
+                        });
+                    }
+                });
+                // Edit qtys in place
+                $('td.editable').editInPlace({
+                    callback: function(product_id, qty){
+                        $.post('{% url update_qty %}' + product_id + '/' + qty);
+                        return qty;
+                    }
+                });
+			});
+		</script>
+    </head>
+    <body>
+        <div style="height:50px;">
+            <input style="float:left;" id="datepicker"/>
+            <div style="float:left;width:200px;" id="slider"></div>
+            <a style="float:left;" href="{% url create_product %}">New product</a>
+        </div>
+        {% if object_list %}
+            <table id="products">
+                <tr>
+                    <th id="hlabel"/>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Units" %}</th>
+                </tr>
+                {% for p in object_list %}
+                    <tr>
+                        <td id="h{{ p.id }}"/>
+                        <td><a href="{% url update_product p.id %}">{{ p.name }}</a></td>
+                        <td class="editable" id="{{ p.id }}">{{ p.qty }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </body>
+</html>

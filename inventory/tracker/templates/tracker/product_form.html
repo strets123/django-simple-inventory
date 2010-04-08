@@ -1,0 +1,13 @@
+{% load i18n %}
+<form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="{% trans "Save" %}"/>
+</form>
+{% if object %}
+    <form method="post" action="{% url del %}">
+        {% csrf_token %}
+        <input type="hidden" name="object_id" value="{{ object.id }}"/>
+        <input type="submit" value="{% trans "Delete" %}"/>
+    </form>
+{% endif %}
