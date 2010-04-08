@@ -48,21 +48,25 @@
     </head>
     <body>
         <div style="height:50px;">
-            <input style="float:left;" id="datepicker"/>
+            <input style="float:left;margin-right:20px;" id="datepicker"/>
             <div style="float:left;width:200px;" id="slider"></div>
-            <a style="float:left;" href="{% url create_product %}">New product</a>
+            <a style="float:left;padding-left:20px;" href="{% url create_product %}">New product</a>
         </div>
         {% if object_list %}
             <table id="products">
                 <tr>
                     <th id="hlabel"/>
                     <th>{% trans "Product" %}</th>
+                    <th>{% trans "Cost price" %}</th>
+                    <th>{% trans "Sell price" %}</th>
                     <th>{% trans "Units" %}</th>
                 </tr>
                 {% for p in object_list %}
                     <tr>
                         <td id="h{{ p.id }}"/>
                         <td><a href="{% url update_product p.id %}">{{ p.name }}</a></td>
+                        <td>{{ p.cost_price }}</td>
+                        <td>{{ p.sell_price }}</td>
                         <td class="editable" id="{{ p.id }}">{{ p.qty }}</td>
                     </tr>
                 {% endfor %}
